@@ -6,7 +6,7 @@
 /*   By: aherlaud <aherlaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/09 23:34:39 by alex              #+#    #+#             */
-/*   Updated: 2025/07/11 11:44:18 by aherlaud         ###   ########.fr       */
+/*   Updated: 2025/07/11 15:28:51 by aherlaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,11 +27,11 @@ int	end_or_pipe(t_exec *exec, pid_t child, int *end, t_shell *shell)
 		{
 			if (waitpid(PIPEX->child_tab[i++], &status, 0) == -1)
 				return (FALSE);
-			check_status(status);
+			check_status(status, shell);
 		}
 		if (waitpid(child, &status, 0) == -1)
 			return (FALSE);
-		check_status(status);
+		check_status(status, shell);
 	}
 	else
 		next_pipe(shell, child, end);
@@ -54,7 +54,9 @@ int	child_exec(t_shell *shell, t_exec *exec)
 		free_all(shell);
 		exit(0);
 	}
+	signal(SIGPIPE, SIG_IGN);
 	built_in(exec, shell, 0);
+	signal(SIGPIPE, SIG_DFL);
 	exec_cmd(exec->cmd, shell);
 	exit(130);
 	return (TRUE);
